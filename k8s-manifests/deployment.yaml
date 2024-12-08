@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: cubejs-container
-        image: docker.io/your-docker-username/cubejs-app:latest  # This gets updated in the Jenkins pipeline
+        image: docker.io/thulasiramtejacubejs-app:latest  # This gets updated in the Jenkins pipeline
         ports:
         - containerPort: 4000  # Default port for Cube.js
         env:
