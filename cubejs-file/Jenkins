@@ -1,0 +1,107 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define the necessary environment variables
+        DOCKER_REGISTRY = "docker.io"
+        DOCKER_REPO = "your-docker-username/cubejs-app"  // Replace with your DockerHub repo
+        DOCKER_TAG = "${env.BRANCH_NAME}-${env.BUILD_ID}"
+        SONARQUBE = "SonarQube"  // Name of the SonarQube server in Jenkins
+        GIT_CREDENTIALS = "git-credentials"  // GitHub token credentials ID
+        DOCKER_CREDENTIALS = "dockerhub-credentials"  // DockerHub credentials ID
+        GIT_REPO_URL = "https://github.com/your-username/k8s-manifests.git"  // GitHub repo with k8s manifest
+        MANIFEST_PATH = "k8s-manifests/deployment.yaml"  // Path to the Kubernetes manifest file
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the main source code and Kubernetes manifests
+                checkout scm
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                script {
+                    // Run build and tests (example: npm install and npm test for a Node.js app)
+                    sh 'npm install'
+                    sh 'npm test'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Run SonarQube analysis
+                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                        withSonarQubeEnv(SONARQUBE) {
+                            sh 'npm run sonar'  // Adjust this command according to your setup
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    // Build Docker image
+                    sh "docker build -t ${DOCKER_REGISTRY}/${DOCKER_REPO}:${DOCKER_TAG} ."
+
+                    // Log in to Docker Hub using credentials
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                    }
+
+                    // Push Docker image to Docker Hub
+                    sh "docker push ${DOCKER_REGISTRY}/${DOCKER_REPO}:${DOCKER_TAG}"
+                }
+            }
+        }
+
+        stage('Update Kubernetes Manifest') {
+            steps {
+                script {
+                    // Update the image tag in the Kubernetes manifest file (deployment.yaml)
+                    sh """
+                    sed -i 's|image: .*|image: ${DOCKER_REGISTRY}/${DOCKER_REPO}:${DOCKER_TAG}|' ${MANIFEST_PATH}
+                    """
+
+                    // Commit and push the updated Kubernetes manifest to GitHub
+                    withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        sh """
+                        git config --global user.name "Jenkins"
+                        git config --global user.email "jenkins@yourdomain.com"
+                        git add ${MANIFEST_PATH}
+                        git commit -m "Update Docker image tag to ${DOCKER_TAG}"
+                        git push https://$GIT_USERNAME:$GIT_PASSWORD@${GIT_REPO_URL}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('ArgoCD Sync') {
+            steps {
+                script {
+                    // Trigger ArgoCD to sync the Kubernetes manifests (this will deploy the new image)
+                    // Assuming ArgoCD is configured to watch the Git repository where the manifest is located
+                    sh """
+                    argocd app sync your-argocd-app-name  // Replace with your actual ArgoCD app name
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully."
+        }
+        failure {
+            echo "Pipeline failed."
+        }
+    }
+}
