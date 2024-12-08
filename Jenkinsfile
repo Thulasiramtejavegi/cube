@@ -23,8 +23,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Install dependencies for Cube.js application
-                    sh 'npm install'
+                    // Install dependencies for Cube.js application   // Use npm install with --legacy-peer-deps to bypass the TypeScript version conflict
+                    sh 'npm install --legacy-peer-deps'
                 }
             }
         }
