@@ -9,7 +9,7 @@ pipeline {
         SONARQUBE = "SonarQube"  // Name of the SonarQube server in Jenkins
         GIT_CREDENTIALS = "git-credentials"  // GitHub token credentials ID
         DOCKER_CREDENTIALS = "dockerhub-credentials"  // DockerHub credentials ID
-        GIT_REPO_URL = "https://github.com/Thulasiramtejavegi/k8s-manifests.git"  // GitHub repo with k8s manifest
+        GIT_REPO_URL = "https://github.com/your-username/k8s-manifests.git"  // GitHub repo with k8s manifest
         MANIFEST_PATH = "k8s-manifests/deployment.yaml"  // Path to the Kubernetes manifest file
     }
 
@@ -72,8 +72,8 @@ pipeline {
                     // Commit and push the updated Kubernetes manifest to GitHub
                     withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                         sh """
-                        git config --global user.name "Thulasiramtejavegi"
-                        git config --global user.email "thulasiramteja.vegi@grooveinnovations.ai"
+                        git config --global user.name "Jenkins"
+                        git config --global user.email "jenkins@yourdomain.com"
                         git add ${MANIFEST_PATH}
                         git commit -m "Update Docker image tag to ${DOCKER_TAG}"
                         git push https://$GIT_USERNAME:$GIT_PASSWORD@${GIT_REPO_URL}
