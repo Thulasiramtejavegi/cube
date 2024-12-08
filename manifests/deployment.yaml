@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cubejs-deployment
+  labels:
+    app: cubejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cubejs
+  template:
+    metadata:
+      labels:
+        app: cubejs
+    spec:
+      containers:
+        - name: cubejs
+          image: thulasiramteja/cubejs:latest  # This will be updated by Jenkins
+          ports:
+            - containerPort: 4000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: CUBEJS_API_SECRET
+              value: "your-secret-key"
+            - name: CUBEJS_DEV_MODE
+              value: "false"
