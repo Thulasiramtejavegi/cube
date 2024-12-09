@@ -13,11 +13,33 @@ pipeline {
     }
 
     stages {
-        stage('Clean Workspace') {
+        stage('Verify Docker Setup') {
             steps {
                 script {
-                    deleteDir()  // Clean workspace before each build
+                    // Check if Docker is running
+                    def dockerStatus = sh(script: 'sudo systemctl is-active docker', returnStatus: true)
+                    if (dockerStatus != 0) {
+                        error 'Docker daemon is not running!'
+                    }
+
+                    // Check Docker socket permissions
+                    def socketPermissions = sh(script: 'ls -l /var/run/docker.sock', returnStdout: true).trim()
+                    echo "Docker socket permissions: ${socketPermissions}"
+
+                    // Check Jenkins user permissions on Docker
+                    def dockerCheck = sh(script: 'sudo -u jenkins docker ps', returnStatus: true)
+                    if (dockerCheck != 0) {
+                        error 'Jenkins user does not have the required permissions to interact with Docker!'
+                    }
+
+                    echo 'Docker setup looks good!'
                 }
+            }
+        }
+
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()  // Clean workspace before each build
             }
         }
 
@@ -58,9 +80,14 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh """
-                        docker buildx build -f ${DOCKERFILE_PATH} -t ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore
-                    """
+                    // Initialize Docker Buildx builder
+                    sh '''
+                        docker buildx create --use --name mybuilder || echo "Builder already exists"
+                        docker buildx inspect mybuilder --bootstrap
+                    '''
+                    
+                    // Build Docker image using Buildx
+                    docker buildx build --file ${DOCKERFILE_PATH} --tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore
                 }
             }
         }
