@@ -16,18 +16,15 @@ pipeline {
         stage('Verify Docker Setup') {
             steps {
                 script {
-                    // Check if Docker is running
-                    def dockerStatus = sh(script: 'sudo systemctl is-active docker', returnStatus: true)
+                    def dockerStatus = sh(script: 'sudo -E systemctl is-active docker', returnStatus: true)
                     if (dockerStatus != 0) {
                         error 'Docker daemon is not running!'
                     }
 
-                    // Check Docker socket permissions
                     def socketPermissions = sh(script: 'ls -l /var/run/docker.sock', returnStdout: true).trim()
                     echo "Docker socket permissions: ${socketPermissions}"
 
-                    // Check Jenkins user permissions on Docker
-                    def dockerCheck = sh(script: 'sudo -u jenkins docker ps', returnStatus: true)
+                    def dockerCheck = sh(script: 'sudo -E -u jenkins docker ps', returnStatus: true)
                     if (dockerCheck != 0) {
                         error 'Jenkins user does not have the required permissions to interact with Docker!'
                     }
@@ -80,14 +77,11 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Initialize Docker Buildx builder
-                    sh '''
+                    sh """
                         docker buildx create --use --name mybuilder || echo "Builder already exists"
                         docker buildx inspect mybuilder --bootstrap
-                    '''
-                    
-                    // Build Docker image using Buildx
-                    sh "docker buildx build --file ${DOCKERFILE_PATH} --tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore"
+                        docker buildx build --file ${DOCKERFILE_PATH} --tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore
+                    """
                 }
             }
         }
