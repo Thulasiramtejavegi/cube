@@ -52,19 +52,20 @@ pipeline {
         }
 
         stage('Update Kubernetes Deployment YAML') {
-    steps {
-        script {
-            def officialImage = "cubejs/cube:latest" // Using official Cube.js image
-            sh """
-                #!/bin/bash
-                sed -i 's|image: .*|image: ${officialImage}|' manifests/deployment.yaml
-                git config user.name "Thulasiramtejavegi"
-                git config user.email "thulasiramteja.vegi@grooveinnovations.ai"
-                git add manifests/deployment.yaml
-                git commit -m "Update deployment.yaml to use official Docker image ${officialImage}" || true
-                git push origin HEAD:${env.BRANCH_NAME} || true
-            """
+            steps {
+                script {
+                    def officialImage = "cubejs/cube:latest" // Using official Cube.js image
+                    sh """
+                        #!/bin/bash
+                        sed -i 's|image: .*|image: ${officialImage}|' manifests/deployment.yaml
+                        git config user.name "Thulasiramtejavegi"
+                        git config user.email "thulasiramteja.vegi@grooveinnovations.ai"
+                        git add manifests/deployment.yaml
+                        git commit -m "Update deployment.yaml to use official Docker image ${officialImage}" || true
+                        git push origin HEAD:${env.BRANCH_NAME} || true
+                    """
+                }
+            }
         }
     }
 }
-
