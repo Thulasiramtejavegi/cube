@@ -43,7 +43,7 @@ pipeline {
                 script {
                     // Perform SonarQube analysis with the provided credentials
                     withSonarQubeEnv('SonarQube') {
-                        sh 'sonar-scanner -Dsonar.projectKey=cubejs -Dsonar.sources=src'
+                        sh '/opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=cubejs -Dsonar.sources=src'
                     }
                 }
             }
