@@ -2,13 +2,14 @@ pipeline {
     agent any
 
     environment {
+        DOCKER_BUILDKIT = "1"  // Enable Docker BuildKit
         DOCKER_IMAGE = 'thulasiramteja/cubejs'
         DOCKER_TAG = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
         GITHUB_REPO = 'https://github.com/Thulasiramtejavegi/cube.git'
         SONARQUBE_URL = 'http://192.168.0.109:9000'
         SONARQUBE_CREDENTIALS = 'sonarqube-token'
-        DOCKERFILE_PATH = 'rust/cubestore/Dockerfile'  // Update this if a different Dockerfile is used
-        DOCKER_CONTEXT = 'rust/cubestore'             // Update this for the correct build context
+        DOCKERFILE_PATH = 'rust/cubestore/Dockerfile'  // Dockerfile path
+        DOCKER_CONTEXT = 'rust/cubestore'             // Build context directory
     }
 
     stages {
