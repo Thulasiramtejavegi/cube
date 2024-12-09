@@ -2,14 +2,10 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_BUILDKIT = "1"  // Enable Docker BuildKit
-        DOCKER_IMAGE = 'thulasiramteja/cubejs'
-        DOCKER_TAG = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+        DOCKER_IMAGE = 'cubejs/cube:latest'  // Official Docker image
         GITHUB_REPO = 'https://github.com/Thulasiramtejavegi/cube.git'
         SONARQUBE_URL = 'http://192.168.0.109:9000'
         SONARQUBE_CREDENTIALS = 'sonarqube-token'
-        DOCKERFILE_PATH = 'rust/cubestore/Dockerfile'  // Dockerfile path
-        DOCKER_CONTEXT = '.'  // Root of the repository
     }
 
     stages {
@@ -58,19 +54,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh """
-                        docker buildx build -f ${DOCKERFILE_PATH} -t ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_CONTEXT}
-                    """ || error("Docker build failed")
-                }
-            }
-        }
-
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG} || error('Failed to push Docker image')"
-                    }
+                    // No Docker build step needed as we are using the official image
                 }
             }
         }
@@ -78,7 +62,7 @@ pipeline {
         stage('Update Kubernetes Deployment YAML') {
             steps {
                 script {
-                    def newImage = "${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    def newImage = "${DOCKER_IMAGE}"
                     sh """
                         sed -i 's|image: .*|image: ${newImage}|' manifests/deployment.yaml
                         git config user.name "Thulasiramtejavegi"
