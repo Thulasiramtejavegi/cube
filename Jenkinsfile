@@ -9,7 +9,7 @@ pipeline {
         SONARQUBE_URL = 'http://192.168.0.109:9000'
         SONARQUBE_CREDENTIALS = 'sonarqube-token'
         DOCKERFILE_PATH = 'rust/cubestore/Dockerfile'  // Dockerfile path
-        DOCKER_CONTEXT = 'rust/cubestore'             // Build context directory
+        DOCKER_CONTEXT = '.'  // Using the root context directory (could be changed as needed)
     }
 
     stages {
@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker buildx build -f ${DOCKERFILE_PATH} -t ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/${DOCKER_CONTEXT}
+                        docker buildx build -f ${DOCKERFILE_PATH} -t ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}
                     """
                 }
             }
