@@ -87,7 +87,7 @@ pipeline {
                     '''
                     
                     // Build Docker image using Buildx
-                    docker buildx build --file ${DOCKERFILE_PATH} --tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore
+                    sh "docker buildx build --file ${DOCKERFILE_PATH} --tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore"
                 }
             }
         }
