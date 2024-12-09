@@ -51,14 +51,6 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    // No Docker build step needed as we are using the official image
-                }
-            }
-        }
-
         stage('Update Kubernetes Deployment YAML') {
             steps {
                 script {
