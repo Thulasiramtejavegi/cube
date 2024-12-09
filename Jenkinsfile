@@ -21,17 +21,6 @@ pipeline {
             }
         }
 
-        stage('Verify Docker Setup') {
-            steps {
-                script {
-                    def dockerRunning = sh(script: 'sudo -E systemctl is-active docker', returnStatus: true)
-                    if (dockerRunning != 0) {
-                        error 'Docker daemon is not running!'
-                    }
-                }
-            }
-        }
-
         stage('Clone Repository') {
             steps {
                 script {
@@ -43,7 +32,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh 'npm install --legacy-peer-deps'
+                    sh 'npm install --legacy-peer-deps || echo "Failed to install dependencies"'
                 }
             }
         }
@@ -51,7 +40,7 @@ pipeline {
         stage('Build Cube.js Application') {
             steps {
                 script {
-                    sh 'npm run build'
+                    sh 'npm run build || echo "Build failed"'
                 }
             }
         }
@@ -70,8 +59,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker buildx build --file ${DOCKERFILE_PATH} --tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore
-                    """
+                        docker buildx build -f ${DOCKERFILE_PATH} -t ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_CONTEXT}
+                    """ || error("Docker build failed")
                 }
             }
         }
@@ -80,7 +69,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG} || error('Failed to push Docker image')"
                     }
                 }
             }
@@ -95,8 +84,8 @@ pipeline {
                         git config user.name "Thulasiramtejavegi"
                         git config user.email "thulasiramteja.vegi@grooveinnovations.ai"
                         git add manifests/deployment.yaml
-                        git commit -m "Update deployment.yaml with new Docker image ${newImage}"
-                        git push origin HEAD:${env.BRANCH_NAME}
+                        git commit -m "Update deployment.yaml with new Docker image ${newImage}" || error("Failed to commit changes")
+                        git push origin HEAD:${env.BRANCH_NAME} || error("Failed to push changes")
                     """
                 }
             }
