@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker build -f ${DOCKERFILE_PATH} -t ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_CONTEXT}
+                        docker buildx build -f ${DOCKERFILE_PATH} -t ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore
                     """
                 }
             }
