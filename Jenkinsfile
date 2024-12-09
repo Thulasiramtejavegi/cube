@@ -13,30 +13,22 @@ pipeline {
     }
 
     stages {
-        stage('Verify Docker Setup') {
+        stage('Clean Workspace') {
             steps {
                 script {
-                    def dockerStatus = sh(script: 'sudo -E systemctl is-active docker', returnStatus: true)
-                    if (dockerStatus != 0) {
-                        error 'Docker daemon is not running!'
-                    }
-
-                    def socketPermissions = sh(script: 'ls -l /var/run/docker.sock', returnStdout: true).trim()
-                    echo "Docker socket permissions: ${socketPermissions}"
-
-                    def dockerCheck = sh(script: 'sudo -E -u jenkins docker ps', returnStatus: true)
-                    if (dockerCheck != 0) {
-                        error 'Jenkins user does not have the required permissions to interact with Docker!'
-                    }
-
-                    echo 'Docker setup looks good!'
+                    deleteDir()  // Clean workspace before each build
                 }
             }
         }
 
-        stage('Clean Workspace') {
+        stage('Verify Docker Setup') {
             steps {
-                deleteDir()  // Clean workspace before each build
+                script {
+                    def dockerRunning = sh(script: 'sudo -E systemctl is-active docker', returnStatus: true)
+                    if (dockerRunning != 0) {
+                        error 'Docker daemon is not running!'
+                    }
+                }
             }
         }
 
@@ -78,8 +70,6 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker buildx create --use --name mybuilder || echo "Builder already exists"
-                        docker buildx inspect mybuilder --bootstrap
                         docker buildx build --file ${DOCKERFILE_PATH} --tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${WORKSPACE}/rust/cubestore
                     """
                 }
