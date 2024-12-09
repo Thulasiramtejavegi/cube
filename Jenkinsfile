@@ -20,7 +20,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 script {
-                    git credentialsId: 'github-credentials', url: "${GITHUB_REPO}"
+                    git(credentialsId: 'github-credentials', url: "${GITHUB_REPO}")
                 }
             }
         }
