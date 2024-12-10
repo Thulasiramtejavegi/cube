@@ -62,7 +62,7 @@ pipeline {
                         git config user.email "thulasiramteja.vegi@grooveinnovations.ai"
                         git add manifests/deployment.yaml
                         git commit -m "Update deployment.yaml to use official Docker image ${officialImage}" || true
-                        git push origin HEAD:${env.BRANCH_NAME} || true
+                        git push https://${env.GITHUB_USERNAME}:${env.GITHUB_TOKEN}@github.com/Thulasiramtejavegi/cube.git HEAD:${env.BRANCH_NAME} || true
                     """
                 }
             }
