@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'cubejs/cube:latest'  // Official Docker image
-        CUSTOM_IMAGE = 'your-dockerhub-username/cubejs:latest' // Replace with your DockerHub username
+        CUSTOM_IMAGE = 'thulasiramteja/cubejs:latest' // Replace with your DockerHub username
         GITHUB_REPO = 'https://github.com/Thulasiramtejavegi/cube.git'
         SONARQUBE_URL = 'http://192.168.0.113:9000'
         SONARQUBE_CREDENTIALS = 'sonarqube-token'
