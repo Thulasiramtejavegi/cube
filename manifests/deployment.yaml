@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: cubejs
-        image: thulasiramteja/cubejs:latest  # Updated to reflect the new DockerHub image
+        image: thulasiramteja/cubejs:latest  # Ensure this image is correct for your setup
         ports:
         - containerPort: 4000
         - containerPort: 15432
@@ -22,9 +22,9 @@ spec:
         - name: CUBEJS_DEV_MODE
           value: "true"
         volumeMounts:
-        - name: cube-config
+        - name: cube-config  # This must match the volume name specified below
           mountPath: /cube/conf
-  volumes:
-  - name: cube-config
-    hostPath:
-      path: /path/to/your/cubejs/config  # Replace with the actual path to your Cube.js config files
+      volumes:
+      - name: cube-config
+        hostPath:
+          path: /path/to/your/cubejs/config  # Update this to match your host path
