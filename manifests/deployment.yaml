@@ -1,9 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cubejs-deployment
-  labels:
-    app: cubejs
+  name: cubejs
 spec:
   replicas: 1
   selector:
@@ -15,14 +13,18 @@ spec:
         app: cubejs
     spec:
       containers:
-        - name: cubejs
-          image: cubejs/cube:latest  # This will be updated by Jenkins
-          ports:
-            - containerPort: 4000
-          env:
-            - name: NODE_ENV
-              value: "production"
-            - name: CUBEJS_API_SECRET
-              value: "your-secret-key"
-            - name: CUBEJS_DEV_MODE
-              value: "false"
+      - name: cubejs
+        image: thulasiramteja/cubejs:latest  # Updated to reflect the new DockerHub image
+        ports:
+        - containerPort: 4000
+        - containerPort: 15432
+        env:
+        - name: CUBEJS_DEV_MODE
+          value: "true"
+        volumeMounts:
+        - name: cube-config
+          mountPath: /cube/conf
+  volumes:
+  - name: cube-config
+    hostPath:
+      path: /path/to/your/cubejs/config  # Replace with the actual path to your Cube.js config files
