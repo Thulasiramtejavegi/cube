@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'cubejs/cube:latest'  // Official Docker image
+        DOCKER_IMAGE = 'cubejs/cube:latest'           // Official Docker image
         CUSTOM_IMAGE = 'thulasiramteja/cubejs:latest' // Replace with your DockerHub username
         GITHUB_REPO = 'https://github.com/Thulasiramtejavegi/cube.git'
         SONARQUBE_URL = 'http://192.168.0.113:9000'
-        SONARQUBE_CREDENTIALS = 'sonarqube-token'
+        SONARQUBE_CREDENTIALS = 'sonarqube-token'     // Jenkins credentials ID for SonarQube
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials' // Jenkins credentials ID for DockerHub
     }
 
@@ -14,7 +14,7 @@ pipeline {
         stage('Clean Workspace') {
             steps {
                 script {
-                    deleteDir()  // Clean workspace before each build
+                    deleteDir() // Clean workspace before each build
                 }
             }
         }
@@ -56,13 +56,14 @@ pipeline {
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
-                    // Pull official image, tag it with your DockerHub repository, and push it
-                    sh """
-                        docker pull ${DOCKER_IMAGE}
-                        docker tag ${DOCKER_IMAGE} ${CUSTOM_IMAGE}
-                        echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
-                        docker push ${CUSTOM_IMAGE}
-                    """
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh """
+                            docker pull ${DOCKER_IMAGE}
+                            docker tag ${DOCKER_IMAGE} ${CUSTOM_IMAGE}
+                            echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
+                            docker push ${CUSTOM_IMAGE}
+                        """
+                    }
                 }
             }
         }
@@ -71,7 +72,6 @@ pipeline {
             steps {
                 script {
                     sh """
-                        #!/bin/bash
                         sed -i 's|image: .*|image: ${CUSTOM_IMAGE}|' manifests/deployment.yaml
                         git config user.name "Thulasiramtejavegi"
                         git config user.email "thulasiramteja.vegi@grooveinnovations.ai"
