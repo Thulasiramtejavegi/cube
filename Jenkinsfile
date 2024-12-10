@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'cubejs/cube:latest'  // Official Docker image
         GITHUB_REPO = 'https://github.com/Thulasiramtejavegi/cube.git'
-        SONARQUBE_URL = 'http://192.168.0.109:9000'
+        SONARQUBE_URL = 'http://192.168.0.113:9000'
         SONARQUBE_CREDENTIALS = 'sonarqube-token'
     }
 
