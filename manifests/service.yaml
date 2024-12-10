@@ -7,6 +7,6 @@ spec:
     app: cubejs
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 4000
-  type: LoadBalancer
+      port: 80  # This is the external port that users will access
+      targetPort: 4000  # Internal container port that Cube.js application uses
+  type: NodePort  # Expose the service externally using a NodePort
