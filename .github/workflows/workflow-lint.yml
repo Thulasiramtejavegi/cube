@@ -21,13 +21,17 @@ jobs:
       - name: Run Dependency Audit
         run: npm audit
 
-      - name: Fix Dependency Issues
-        run: npm audit fix
-
-      - name: Run Tests
+      - name: Review and Fix Vulnerabilities
         run: |
-          echo "Running tests..."
-          npm run custom-test.json  # Directly reference the script if it's at the root
+          # Review each vulnerability manually and decide on fixes
+          npm audit fix --force  # Use --force only after reviewing changes
+          # Pin or update dependencies manually if required
+          # Example: "npm install rollup@2.79.2"
+
+      - name: Run Custom Tests
+        run: |
+          echo "Running custom tests..."
+          npm run custom-test.json
 
       - name: Cache `node_modules`
         uses: actions/cache@v2
