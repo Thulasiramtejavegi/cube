@@ -21,8 +21,8 @@ jobs:
       - name: Run Tests
         run: |
           echo "Running tests..."
-          # Replace with your test command
-          npm test
+          # Replace with your actual test script command
+          npm run test --prefix rust/cubestore  # Adjust the path to the `package.json` if needed
 
       - name: Cache `node_modules`
         uses: actions/cache@v2
