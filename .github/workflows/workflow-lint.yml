@@ -1,27 +1,45 @@
-name: Build and Push Docker Image
+name: Build, Test, and Push Docker Image
 
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Log in to DockerHub
+      - name: Install Dependencies
+        run: |
+          echo "Installing dependencies..."
+          # Install any necessary dependencies for the project
+          # For example, using npm for Node.js projects:
+          npm install
+
+      - name: Run Tests
+        run: |
+          echo "Running tests..."
+          # Replace with your test command
+          # For example, using npm for Node.js projects:
+          npm test
+
+      - name: Cache `node_modules`
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      # Build the Docker image
       - name: Build Docker Image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/your-image-name:latest .
 
-      # Push the Docker image to DockerHub
       - name: Push Docker Image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/your-image-name:latest
