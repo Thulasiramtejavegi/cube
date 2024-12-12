@@ -1,26 +1,27 @@
-name: Lint CI Workflows
+name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ master ]
-    paths:
-      - .github/workflows/**
-  pull_request:
-    paths:
-      - .github/workflows/**
+    branches:
+      - main
 
 jobs:
-  lint:
-    name: Lint workflows yaml
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      # Checkout the repository
+      - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Download actionlint
-        id: get_actionlint
-        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-        shell: bash
-      - name: Check workflow files
-        run: ${{ steps.get_actionlint.outputs.executable }} -color
-        shell: bash
+
+      # Log in to DockerHub
+      - name: Log in to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      # Build the Docker image
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/your-image-name:latest .
+
+      # Push the Docker image to DockerHub
+      - name: Push Docker Image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/your-image-name:latest
