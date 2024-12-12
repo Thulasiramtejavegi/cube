@@ -16,15 +16,12 @@ jobs:
       - name: Install Dependencies
         run: |
           echo "Installing dependencies..."
-          # Install any necessary dependencies for the project
-          # For example, using npm for Node.js projects:
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Run Tests
         run: |
           echo "Running tests..."
           # Replace with your test command
-          # For example, using npm for Node.js projects:
           npm test
 
       - name: Cache `node_modules`
