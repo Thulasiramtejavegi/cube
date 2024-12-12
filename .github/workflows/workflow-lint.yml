@@ -23,10 +23,9 @@ jobs:
 
       - name: Review and Fix Vulnerabilities
         run: |
-          # Review each vulnerability manually and decide on fixes
           npm audit fix --force  # Use --force only after reviewing changes
-          # Pin or update dependencies manually if required
-          # Example: "npm install rollup@2.79.2"
+          # Manually pin specific versions for critical dependencies if needed
+          npm install webpack@5.51.1 vue@2.6.14
 
       - name: Run Custom Tests
         run: |
