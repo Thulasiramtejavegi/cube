@@ -18,10 +18,17 @@ jobs:
           echo "Installing dependencies..."
           npm install --legacy-peer-deps
 
+      - name: Run Dependency Audit
+        run: npm audit
+
+      - name: Fix Dependency Issues
+        run: npm audit fix
+
       - name: Run Tests
         run: |
           echo "Running tests..."
-          npm run custom-test --prefix   # Adjust the path if needed
+          npm run custom-test.json  # Directly reference the script if it's at the root
+
       - name: Cache `node_modules`
         uses: actions/cache@v2
         with:
