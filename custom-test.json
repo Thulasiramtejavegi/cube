@@ -1,0 +1,12 @@
+"scripts": {
+  "build": "rm -rf dist && npm run tsc",
+  "tsc": "tsc",
+  "watch": "tsc -w",
+  "lint": "eslint js-wrapper/* --ext .ts,.js",
+  "lint:fix": "eslint --fix js-wrapper/* --ext .ts,js",
+  "unit": "jest",
+  "unit:debug": "jest --runInBand",
+  "postinstall": "node bin/post-install",
+  "custom-test": "echo 'Performing basic checks...'; # Add actual validation commands here"
+}
+
