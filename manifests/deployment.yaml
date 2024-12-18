@@ -27,4 +27,4 @@ spec:
       volumes:
       - name: cube-config
         hostPath:
-          path: /path/to/your/cubejs/config  # Update this to match your host path
+          path: /path/to/your/cubejs/config  # Update this to match your host paths
