@@ -5,7 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'cubejs/cube:latest'           // Official Docker image
         CUSTOM_IMAGE = 'thulasiramteja/cubejs:latest' // Replace with your DockerHub username
         GITHUB_REPO = 'https://github.com/Thulasiramtejavegi/cube.git'
-        SONARQUBE_URL = 'http://192.168.0.113:9000'
+        SONARQUBE_URL = 'http://192.168.0.108:9000'
         SONARQUBE_CREDENTIALS = 'sonarqube-token'     // Jenkins credentials ID for SonarQube
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials' // Jenkins credentials ID for DockerHub
     }
