@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: latest
+    commands:
+      - sudo apt update -y
+      - sudo apt install -y docker.io
+      - sudo systemctl start docker
+      - sudo systemctl enable docker
+
+  build:
+    commands:
+      - docker stop cubejs-container || true
+      - docker rm cubejs-container || true
+      - docker run -d --name cubejs-container -p 4000:4000 -p 15432:15432 \
+        -v $PWD:/cube/conf -e CUBEJS_DEV_MODE=true cubejs/cube
+
+artifacts:
+  files:
+    - '**/*'
